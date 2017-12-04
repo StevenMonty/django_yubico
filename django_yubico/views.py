@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.template import RequestContext
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.models import User
@@ -9,7 +9,10 @@ from django.core.urlresolvers import reverse
 
 from django.views.decorators.cache import never_cache
 
-from forms import LoginForm, PasswordForm
+from django_yubico.forms import LoginForm, PasswordForm
+
+admin_site_header = 'SFP-API'
+admin_site_title = 'SFP-API'
 
 # Ask for the user password after the token
 YUBIKEY_USE_PASSWORD = getattr(settings, 'YUBICO_USE_PASSWORD', True)
@@ -42,8 +45,7 @@ def login(request, template_name='django_yubico/login.html',
     """
     Displays the login form and handles the login action.
     """
-    redirect_to = request.REQUEST.get(redirect_field_name,
-                                      settings.LOGIN_REDIRECT_URL)
+    redirect_to = request.GET.get(redirect_field_name, request.POST.get(redirect_field_name, settings.LOGIN_REDIRECT_URL))
 
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -58,16 +60,15 @@ def login(request, template_name='django_yubico/login.html',
                 request.session[YUBIKEY_SESSION_AUTH_BACKEND] = user.backend
                 request.session[YUBIKEY_SESSION_ATTEMPT_COUNTER] = 1
 
-                return HttpResponseRedirect(reverse('yubico_django_password'))
+                return HttpResponseRedirect(reverse('yubico_django_password') + '?next=' + redirect_to)
             else:
                 auth_login(request=request, user=user)
                 return HttpResponseRedirect(redirect_to)
     else:
         form = LoginForm()
 
-    dictionary = {'form': form, redirect_field_name: redirect_to}
-    return render_to_response(template_name, dictionary,
-                              context_instance=RequestContext(request))
+    dictionary = {'form': form, redirect_field_name: redirect_to, 'site_header':admin_site_header, 'site_title':admin_site_title}
+    return render(request, template_name, dictionary)
 
 
 @never_cache
@@ -77,8 +78,8 @@ def password(request, template_name='django_yubico/password.html',
     Displays the password form and handles the login action.
     """
 
-    redirect_to = request.REQUEST.get(redirect_field_name,
-                                      settings.LOGIN_REDIRECT_URL)
+    redirect_to = request.GET.get(redirect_field_name,
+                                  request.POST.get(redirect_field_name, settings.LOGIN_REDIRECT_URL))
 
     for key in SESSION_KEYS:
         # Make sure all the required session keys are present
@@ -113,9 +114,8 @@ def password(request, template_name='django_yubico/password.html',
     else:
         form = PasswordForm(user=user)
 
-    dictionary = {'form': form, redirect_field_name: redirect_to}
-    return render_to_response(template_name, dictionary,
-                              context_instance=RequestContext(request))
+    dictionary = {'form': form, redirect_field_name: redirect_to, 'site_header':admin_site_header, 'site_title':admin_site_title}
+    return render(request, template_name, dictionary)
 
 
 def reset_user_session(session):

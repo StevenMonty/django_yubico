@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.contrib.auth.models import User
 
-from models import YubicoKey
+from .models import YubicoKey
 
 # How much time can pass between the time when the first and last OTP is
 # generated

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from models import YubicoKey
+from django_yubico.models import YubicoKey
 
 
 class YubicoKeyAdmin(admin.ModelAdmin):

@@ -14,9 +14,8 @@ YUBICO_MULTI_MODE = getattr(settings, 'YUBICO_MULTI_MODE', False)
 # How many OTPs user needs to enter when multi mode is enabled
 YUBICO_MULTI_NUMBER = getattr(settings, 'YUBICO_MULTI_NUMBER', 3)
 
-STYLE = ''''background:url("/site_media/images/yubiright_16x16.gif") no-repeat
-scroll 2px 2px white; padding-left:20px;'''
-PASSWORD_INPUT_WIDGET_ATTRS = {'style': STYLE}
+
+PASSWORD_INPUT_WIDGET_ATTRS = {'style': 'clear: both; padding: 8px; width: 100%; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box;'}
 
 
 class LoginForm(forms.Form):

@@ -1,13 +1,8 @@
-try:
-    from django.conf.urls import patterns, url
-except ImportError:
-    # Django < 1.4
-    from django.conf.urls.defaults import patterns, url
+from django.conf.urls import url
 
-from views import login, password
+from django_yubico.views import login, password
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^login', login, name='yubico_django_login'),
     url(r'^password', password, name='yubico_django_password'),
-)
+]
